@@ -1,10 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(() => {
+    // Recuperar del cache local al iniciar
+    const saved = localStorage.getItem('count');
+    return saved ? Number(saved) : 0;
+  });
+
+  useEffect(() => {
+    // Guardar el count en localStorage cada vez que cambie
+    localStorage.setItem('count', count);
+  }, [count]);
 
   return (
     <>
@@ -18,7 +27,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={() => setCount((c) => c + 1)}>
           count is {count}
         </button>
         <p>
@@ -29,7 +38,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
