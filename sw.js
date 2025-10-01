@@ -1,12 +1,11 @@
 self.addEventListener('install', event => {
-    caches.open("appShell_v1.1")
+    caches.open("appShell_v2")
     .then(cache => {
         cache.addAll([
-            "/index.html",
-            "/src/main.jsx",
-            "/src/App.css",
-            "/vite.svg",
-            "/src/assets/react.svg",
+            "/",               // raíz
+            "/index.html",     // punto de entrada
+            "/neko.png",   // icono 192px
+            "/neko-512.png"    // icono 512px
         ]);
     });
     self.skipWaiting();
@@ -14,8 +13,8 @@ self.addEventListener('install', event => {
 
 self.addEventListener('activate', event => {
     // Elimina las caches antiguas explícitamente
-    caches.delete("appShell_v1.0");
-    caches.delete("dynamic_v0.1");
+    caches.delete("appShell_v1.1");
+    caches.delete("dynamic_v1.1");
 });
 
 self.addEventListener('fetch', event => {
@@ -28,7 +27,7 @@ self.addEventListener('fetch', event => {
                 }
                 return fetch(event.request)
                 .then(networkResp => {
-                    caches.open("dynamic_v1.1")
+                    caches.open("dynamic_v2")
                     .then(cache => {
                         cache.put(event.request, networkResp.clone());
                     });
@@ -41,6 +40,7 @@ self.addEventListener('fetch', event => {
         );
     }
 });
+
 
 /*self.addEventListener('sync', event => {});
 self.addEventListener('push', event => {});*/
