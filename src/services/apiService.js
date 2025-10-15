@@ -211,21 +211,9 @@ class ApiService {
   }
 
   async login(credentials) {
-    // Simulamos login ya que no hay endpoint de login en la API
-    // En un caso real, esto sería una llamada al endpoint de login
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          message: 'Login exitoso',
-          status: 'success',
-          user: {
-            id: '1',
-            name: 'Usuario Demo',
-            email: credentials.email,
-            role: 'user'
-          }
-        });
-      }, 1000);
+    return this.makeRequest('/login', {
+      method: 'POST',
+      body: JSON.stringify(credentials)
     });
   }
 

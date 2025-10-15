@@ -182,6 +182,53 @@ function deleteOfflineRequest(id) {
     });
 }
 
+// Manejar notificaciones push
+self.addEventListener('push', event => {
+    console.log('Push event recibido:', event);
+    
+    let data = {};
+    if (event.data) {
+        data = event.data.json();
+    }
+    
+    const options = {
+        body: data.body || 'Nueva notificación',
+        icon: data.icon || '/neko.png',
+        badge: data.badge || '/neko-512.png',
+        tag: 'chupirul-notification',
+        requireInteraction: true,
+        actions: [
+            {
+                action: 'open',
+                title: 'Abrir',
+                icon: '/neko.png'
+            },
+            {
+                action: 'close',
+                title: 'Cerrar',
+                icon: '/neko.png'
+            }
+        ]
+    };
+    
+    event.waitUntil(
+        self.registration.showNotification(data.title || '¡Hola!', options)
+    );
+});
+
+// Manejar clics en notificaciones
+self.addEventListener('notificationclick', event => {
+    console.log('Notification click recibido:', event);
+    
+    event.notification.close();
+    
+    if (event.action === 'open' || !event.action) {
+        event.waitUntil(
+            clients.openWindow(event.notification.data?.url || '/')
+        );
+    }
+});
+
 // Notificar a los clientes sobre la sincronización
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SYNC_OFFLINE_DATA') {

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import apiService from '../services/apiService';
+import notificationService from '../services/notificationService';
 import { testOfflineSync, simulateOfflineData } from '../utils/offlineTest';
 import './Auth.css';
 
@@ -8,6 +9,8 @@ const Dashboard = ({ user, onLogout }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationLoading, setNotificationLoading] = useState(false);
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -16,11 +19,23 @@ const Dashboard = ({ user, onLogout }) => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    // Verificar si las notificaciones están habilitadas
+    checkNotificationStatus();
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
   }, []);
+
+  const checkNotificationStatus = async () => {
+    try {
+      const isSubscribed = await notificationService.isSubscribed();
+      setNotificationsEnabled(isSubscribed);
+    } catch (error) {
+      console.error('Error verificando estado de notificaciones:', error);
+    }
+  };
 
   const loadUsers = async () => {
     setLoading(true);
@@ -71,6 +86,34 @@ const Dashboard = ({ user, onLogout }) => {
       console.log('Datos de prueba agregados. Usa "Debug Datos Offline" para verlos.');
     } catch (error) {
       console.error('Error agregando datos de prueba:', error);
+    }
+  };
+
+  const enableNotifications = async () => {
+    setNotificationLoading(true);
+    try {
+      await notificationService.setupNotifications(user.id);
+      setNotificationsEnabled(true);
+      alert('¡Notificaciones habilitadas exitosamente!');
+    } catch (error) {
+      console.error('Error habilitando notificaciones:', error);
+      alert('Error habilitando notificaciones: ' + error.message);
+    } finally {
+      setNotificationLoading(false);
+    }
+  };
+
+  const sendHelloNotification = async () => {
+    try {
+      await notificationService.sendTestNotification(
+        user.id, 
+        '¡Hola! 👋', 
+        `¡Hola ${user.name}! Esta es una notificación de prueba desde tu PWA.`
+      );
+      alert('¡Notificación enviada! Revisa tu bandeja de notificaciones.');
+    } catch (error) {
+      console.error('Error enviando notificación:', error);
+      alert('Error enviando notificación: ' + error.message);
     }
   };
 
@@ -126,6 +169,25 @@ const Dashboard = ({ user, onLogout }) => {
         <button onClick={addTestData} className="auth-button" style={{background: '#f39c12'}}>
           Agregar Datos de Prueba
         </button>
+        
+        {!notificationsEnabled ? (
+          <button 
+            onClick={enableNotifications} 
+            disabled={notificationLoading}
+            className="auth-button" 
+            style={{background: '#9b59b6'}}
+          >
+            {notificationLoading ? 'Configurando...' : '🔔 Habilitar Notificaciones'}
+          </button>
+        ) : (
+          <button 
+            onClick={sendHelloNotification} 
+            className="auth-button" 
+            style={{background: '#27ae60'}}
+          >
+            👋 ¡Decir Hola!
+          </button>
+        )}
         
         <button onClick={onLogout} className="logout-button">
           Cerrar Sesión
