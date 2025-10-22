@@ -1,5 +1,8 @@
 const CACHE_NAME = 'chupirul-pwa-v3';
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 
+//'http://localhost:3000/api'
+'https://pwa-back-2wk5.onrender.com/api'
+;
 
 self.addEventListener('install', event => {
     console.log('Service Worker instalando...');
