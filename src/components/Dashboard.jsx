@@ -12,6 +12,11 @@ const Dashboard = ({ user, onLogout }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationLoading, setNotificationLoading] = useState(false);
 
+  // 🆕 Estados nuevos para la notificación personalizada
+  const [selectedUser, setSelectedUser] = useState('');
+  const [notifTitle, setNotifTitle] = useState('');
+  const [notifBody, setNotifBody] = useState('');
+
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -117,6 +122,28 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
+  // 🆕 Nueva función para enviar notificaciones personalizadas
+  const sendCustomNotification = async () => {
+    if (!selectedUser) {
+      alert('Selecciona un usuario para enviar la notificación.');
+      return;
+    }
+
+    if (!notifTitle || !notifBody) {
+      alert('Por favor, completa el título y el mensaje.');
+      return;
+    }
+
+    try {
+      await notificationService.sendNotificationToUser(selectedUser, notifTitle, notifBody);
+      alert('✅ Notificación enviada correctamente');
+      setNotifTitle('');
+      setNotifBody('');
+    } catch (error) {
+      alert('❌ Error enviando notificación: ' + error.message);
+    }
+  };
+
   return (
     <div className="dashboard">
       {!isOnline && (
@@ -216,6 +243,48 @@ const Dashboard = ({ user, onLogout }) => {
             ))}
           </div>
         )}
+      </div>
+
+      {/* 🆕 Apartado para enviar notificación personalizada */}
+      <div className="user-info">
+        <h2>Enviar Notificación a un Usuario</h2>
+        <p>Selecciona un usuario y envíale una notificación personalizada.</p>
+
+        <select
+          onChange={(e) => setSelectedUser(e.target.value)}
+          defaultValue=""
+          className="auth-input"
+        >
+          <option value="" disabled>Seleccionar usuario</option>
+          {users.map((u) => (
+            <option key={u._id} value={u._id}>
+              {u.name} - {u.email}
+            </option>
+          ))}
+        </select>
+
+        <input
+          type="text"
+          placeholder="Título de la notificación"
+          value={notifTitle}
+          onChange={(e) => setNotifTitle(e.target.value)}
+          className="auth-input"
+        />
+
+        <textarea
+          placeholder="Contenido del mensaje"
+          value={notifBody}
+          onChange={(e) => setNotifBody(e.target.value)}
+          className="auth-input"
+        />
+
+        <button
+          onClick={sendCustomNotification}
+          className="auth-button"
+          style={{ background: '#3498db' }}
+        >
+          🚀 Enviar Notificación
+        </button>
       </div>
     </div>
   );

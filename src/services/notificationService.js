@@ -1,4 +1,7 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 
+//'http://localhost:3000/api'
+'https://pwa-back-2wk5.onrender.com/api'
+;
 
 class NotificationService {
   constructor() {
@@ -118,6 +121,35 @@ class NotificationService {
 
     } catch (error) {
       console.error('Error enviando notificación:', error);
+      throw error;
+    }
+  }
+
+  // 🆕 Enviar notificación personalizada a un usuario específico
+  async sendNotificationToUser(userId, title, body, icon = '/neko.png', url = '/') {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/send-to-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          title,
+          body,
+          icon,
+          url
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Error enviando notificación personalizada');
+      }
+
+      console.log('Notificación enviada al usuario', userId);
+      return true;
+    } catch (error) {
+      console.error('Error en sendNotificationToUser:', error);
       throw error;
     }
   }

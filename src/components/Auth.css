@@ -1,16 +1,18 @@
+/* Fondo general: verde degradado suave */
 .auth-container {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #a8e6a3 0%, #6edb6e 100%);
   padding: 20px;
 }
 
+/* Tarjeta principal: gris suave */
 .auth-card {
-  background: white;
+  background: #d9e0da;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
   padding: 40px;
   width: 100%;
   max-width: 400px;
@@ -28,30 +30,29 @@
   }
 }
 
+/* Título */
 .auth-card h2 {
   text-align: center;
   margin-bottom: 30px;
-  color: #333;
+  color: #2d3a2d;
   font-size: 28px;
   font-weight: 600;
 }
 
-.form-group {
-  margin-bottom: 20px;
-}
-
+/* Etiquetas */
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  color: #555;
+  color: #3c4a3c;
   font-weight: 500;
   font-size: 14px;
 }
 
+/* Campos de entrada */
 .form-group input {
   width: 100%;
   padding: 12px 16px;
-  border: 2px solid #e1e5e9;
+  border: 2px solid #b5c5b5;
   border-radius: 8px;
   font-size: 16px;
   transition: border-color 0.3s ease;
@@ -60,19 +61,20 @@
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15);
 }
 
 .form-group input:disabled {
-  background-color: #f5f5f5;
+  background-color: #f0f0f0;
   cursor: not-allowed;
 }
 
+/* Botones principales */
 .auth-button {
   width: 100%;
   padding: 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #6edb6e 0%, #4caf50 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -85,7 +87,7 @@
 
 .auth-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 5px 15px rgba(0, 100, 0, 0.3);
 }
 
 .auth-button:disabled {
@@ -94,16 +96,17 @@
   transform: none;
 }
 
+/* Cambiar de login a registro */
 .auth-switch {
   text-align: center;
-  color: #666;
+  color: #4a4a4a;
   font-size: 14px;
 }
 
 .link-button {
   background: none;
   border: none;
-  color: #667eea;
+  color: #388e3c;
   cursor: pointer;
   font-size: 14px;
   text-decoration: underline;
@@ -111,29 +114,31 @@
 }
 
 .link-button:hover {
-  color: #764ba2;
+  color: #2e7d32;
 }
 
+/* Mensajes */
 .error-message {
-  background-color: #fee;
-  color: #c33;
+  background-color: #ffeeee;
+  color: #b71c1c;
   padding: 12px;
   border-radius: 6px;
   margin-bottom: 20px;
   font-size: 14px;
-  border: 1px solid #fcc;
+  border: 1px solid #ffcccc;
 }
 
 .success-message {
-  background-color: #efe;
-  color: #3c3;
+  background-color: #e9f7ec;
+  color: #2e7d32;
   padding: 12px;
   border-radius: 6px;
   margin-bottom: 20px;
   font-size: 14px;
-  border: 1px solid #cfc;
+  border: 1px solid #b7e1b2;
 }
 
+/* Dashboard */
 .dashboard {
   padding: 20px;
   max-width: 800px;
@@ -141,21 +146,22 @@
 }
 
 .dashboard h1 {
-  color: #333;
+  color: #2e2e2e;
   margin-bottom: 30px;
   text-align: center;
 }
 
+/* Contenedor de información */
 .user-info {
-  background: white;
+  background: #828382;
   border-radius: 12px;
   padding: 30px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   margin-bottom: 30px;
 }
 
 .user-info h2 {
-  color: #333;
+  color: #2d3a2d;
   margin-bottom: 20px;
   font-size: 24px;
 }
@@ -169,7 +175,7 @@
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #d0d8d0;
 }
 
 .user-detail:last-child {
@@ -177,16 +183,17 @@
 }
 
 .user-detail strong {
-  color: #555;
+  color: #4a4a4a;
   font-weight: 600;
 }
 
 .user-detail span {
-  color: #333;
+  color: #2e2e2e;
 }
 
+/* Botón cerrar sesión (tono rojizo apagado) */
 .logout-button {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  background: linear-gradient(135deg, #98a19b 0%, #707a73 100%);
   color: white;
   border: none;
   padding: 12px 24px;
@@ -200,11 +207,12 @@
 
 .logout-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+  box-shadow: 0 5px 15px rgba(90, 90, 90, 0.3);
 }
 
+/* Indicador offline */
 .offline-indicator {
-  background: #ff6b6b;
+  background: #8bc34a;
   color: white;
   padding: 10px;
   text-align: center;
@@ -216,8 +224,9 @@
   z-index: 1000;
 }
 
+/* Estado de sincronización */
 .sync-status {
-  background: #4ecdc4;
+  background: #81c784;
   color: white;
   padding: 8px 16px;
   border-radius: 20px;
@@ -225,4 +234,24 @@
   font-weight: 600;
   display: inline-block;
   margin-top: 10px;
+}
+
+.sync-status.offline {
+  background: #9e9e9e;
+}
+
+/* Inputs generales */
+.auth-input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #000000;
+  font-size: 16px;
+  background-color: #6a6a6a;
+}
+
+textarea.auth-input {
+  resize: vertical;
+  min-height: 80px;
 }

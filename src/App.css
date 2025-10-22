@@ -1,6 +1,6 @@
 .App {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #a8e6a3 0%, #6edb6e 100%);
 }
 
 #root {
@@ -9,8 +9,9 @@
   padding: 0;
 }
 
+/* Indicador offline */
 .offline-indicator {
-  background: #ff6b6b;
+  background: #8bc34a;
   color: white;
   padding: 12px;
   text-align: center;
@@ -23,7 +24,7 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos adicionales para la lista de usuarios */
+/* Lista de usuarios */
 .users-list {
   margin-top: 20px;
   max-height: 300px;
@@ -31,16 +32,16 @@
 }
 
 .user-item {
-  background: #f8f9fa;
+  background: #f6f8f6; /* Gris muy claro */
   padding: 12px;
   margin: 8px 0;
   border-radius: 6px;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #4caf50; /* Verde intenso */
   font-size: 14px;
 }
 
 .user-item strong {
-  color: #333;
+  color: #2e2e2e; /* Gris oscuro */
   font-weight: 600;
 }
 
