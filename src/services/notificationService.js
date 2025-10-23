@@ -1,7 +1,6 @@
 const API_BASE_URL = 
 //'http://localhost:3000/api'
-'https://pwa-back-2wk5.onrender.com/api'
-;
+'https://pwa-back-2wk5.onrender.com/api';
 
 class NotificationService {
   constructor() {
@@ -22,7 +21,7 @@ class NotificationService {
     }
   }
 
-  // Verificar si las notificaciones están soportadas
+  // Verificar soporte de notificaciones
   isSupported() {
     return 'Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window;
   }
@@ -32,20 +31,20 @@ class NotificationService {
     if (!this.isSupported()) {
       throw new Error('Las notificaciones push no están soportadas en este navegador');
     }
-
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
       throw new Error('Permisos de notificación denegados');
     }
-
     return permission;
   }
 
-  // Registrar el service worker
+  // Registrar service worker
   async registerServiceWorker() {
     try {
       this.registration = await navigator.serviceWorker.register('/sw.js');
       console.log('Service Worker registrado:', this.registration);
+      // ⚡ Esperar a que el SW esté activo antes de usar PushManager
+      await navigator.serviceWorker.ready;
       return this.registration;
     } catch (error) {
       console.error('Error registrando Service Worker:', error);
@@ -56,34 +55,30 @@ class NotificationService {
   // Suscribirse a notificaciones push
   async subscribe(userId) {
     try {
-      // Obtener la clave pública si no la tenemos
       if (!this.publicKey) {
         await this.getPublicKey();
       }
 
-      // Convertir la clave pública a formato Uint8Array
+      if (!this.registration) {
+        await this.registerServiceWorker();
+      }
+
       const applicationServerKey = this.urlBase64ToUint8Array(this.publicKey);
 
-      // Suscribirse a push
       const subscription = await this.registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: applicationServerKey
+        applicationServerKey
       });
 
       // Enviar la suscripción al servidor
       const response = await fetch(`${API_BASE_URL}/notifications/subscribe`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: userId,
-          subscription: subscription
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, subscription })
       });
 
       if (!response.ok) {
-        throw new Error('Error suscribiendo a notificaciones');
+        throw new Error('Error enviando suscripción al servidor');
       }
 
       console.log('Suscripción exitosa:', subscription);
@@ -100,16 +95,8 @@ class NotificationService {
     try {
       const response = await fetch(`${API_BASE_URL}/notifications/send`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: userId,
-          title: title,
-          body: body,
-          icon: '/neko.png',
-          url: '/'
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, title, body, icon: '/neko.png', url: '/' })
       });
 
       if (!response.ok) {
@@ -125,21 +112,13 @@ class NotificationService {
     }
   }
 
-  // 🆕 Enviar notificación personalizada a un usuario específico
+  // Enviar notificación personalizada a un usuario
   async sendNotificationToUser(userId, title, body, icon = '/neko.png', url = '/') {
     try {
       const response = await fetch(`${API_BASE_URL}/notifications/send-to-user`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId,
-          title,
-          body,
-          icon,
-          url
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, title, body, icon, url })
       });
 
       if (!response.ok) {
@@ -154,26 +133,15 @@ class NotificationService {
     }
   }
 
-  // Configurar notificaciones completas (permisos + suscripción)
+  // Configurar notificaciones completas
   async setupNotifications(userId) {
     try {
-      // 1. Verificar soporte
-      if (!this.isSupported()) {
-        throw new Error('Las notificaciones push no están soportadas');
-      }
-
-      // 2. Solicitar permisos
+      if (!this.isSupported()) throw new Error('Notificaciones push no soportadas');
       await this.requestPermission();
-
-      // 3. Registrar service worker
       await this.registerServiceWorker();
-
-      // 4. Suscribirse
       await this.subscribe(userId);
-
       console.log('Notificaciones configuradas exitosamente');
       return true;
-
     } catch (error) {
       console.error('Error configurando notificaciones:', error);
       throw error;
@@ -182,18 +150,10 @@ class NotificationService {
 
   // Convertir clave base64 a Uint8Array
   urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
-
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
     const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-
-    for (let i = 0; i < rawData.length; ++i) {
-      outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
+    return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
   }
 
   // Verificar si ya está suscrito
@@ -202,7 +162,6 @@ class NotificationService {
       if (!this.registration) {
         this.registration = await navigator.serviceWorker.ready;
       }
-      
       const subscription = await this.registration.pushManager.getSubscription();
       return subscription !== null;
     } catch (error) {
