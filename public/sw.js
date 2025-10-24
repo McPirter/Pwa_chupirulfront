@@ -13,9 +13,9 @@ self.addEventListener('install', event => {
                 "/",
                 "/index.html",
                 "/neko.png",
-                "/neko-512.png",
-                "/src/main.jsx",
-                "/src/App.jsx"
+                "/neko-512.png"
+                /*"/src/main.jsx",
+                "/src/App.jsx"*/
             ]);
         })
     );
