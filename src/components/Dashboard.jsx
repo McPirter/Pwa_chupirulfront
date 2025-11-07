@@ -12,11 +12,12 @@ const Dashboard = ({ user, onLogout }) => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationLoading, setNotificationLoading] = useState(false);
 
-  // 🆕 Estados nuevos para la notificación personalizada
+  // 🔽 Estados nuevos para la notificación personalizada (ya los tenías)
   const [selectedUser, setSelectedUser] = useState('');
   const [notifTitle, setNotifTitle] = useState('');
   const [notifBody, setNotifBody] = useState('');
 
+  // 🔽 EFECTO 1: Manejar estado online/offline (Modificado)
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -24,15 +25,66 @@ const Dashboard = ({ user, onLogout }) => {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Verificar si las notificaciones están habilitadas
-    checkNotificationStatus();
+    // Quitamos 'checkNotificationStatus()' de aquí para manejarlo en el nuevo efecto
+    // que depende del usuario.
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
     };
-  }, []);
+  }, []); // Se ejecuta solo una vez al montar
 
+  // 🔽 NUEVO EFECTO 2: Manejar lógica de Notificaciones al cargar
+  useEffect(() => {
+    // Si no tenemos al usuario, no podemos suscribirlo.
+    if (!user || !user.id) {
+      return;
+    }
+
+    // Función asíncrona para manejar la lógica de notificaciones
+    const setupNotificationsOnLoad = async () => {
+      try {
+        // 1. Primero, verificamos si ya están suscritas
+        const isSubscribed = await notificationService.isSubscribed();
+        if (isSubscribed) {
+          setNotificationsEnabled(true);
+          return; // Ya está suscrito, no hacemos nada más
+        }
+
+        // 2. Si no está suscrito, verificamos el permiso
+        // 'default' significa que el navegador nunca ha preguntado
+        if ('Notification' in window && Notification.permission === 'default') {
+          // 3. Pedimos permiso (esta es la lógica de tu botón)
+          console.log('Solicitando permiso de notificaciones al cargar...');
+          setNotificationLoading(true); 
+          await notificationService.setupNotifications(user.id);
+          setNotificationsEnabled(true);
+          console.log('Notificaciones habilitadas exitosamente.');
+          // (Quitamos los 'alert' para que no sea molesto al cargar)
+        } else if (Notification.permission === 'granted') {
+          // El permiso está dado, pero no la suscripción (Caso raro).
+          // Intentamos suscribir sin molestar.
+          await notificationService.setupNotifications(user.id);
+          setNotificationsEnabled(true);
+        }
+        // Si el permiso es 'denied', no podemos hacer nada automáticamente.
+        // El botón seguirá visible por si el usuario quiere re-intentar.
+
+      } catch (error) {
+        console.error('Error configurando notificaciones al cargar:', error);
+        // No mostramos 'alert' de error al cargar, solo en consola.
+      } finally {
+        setNotificationLoading(false);
+      }
+    };
+
+    setupNotificationsOnLoad();
+
+  }, [user]); // 👈 Depende de 'user'. Se ejecuta cuando 'user' esté disponible.
+
+  
+  // Esta función se mantiene, pero ahora es llamada por el botón
+  // o si el usuario recarga la página (desde el efecto 2).
   const checkNotificationStatus = async () => {
     try {
       const isSubscribed = await notificationService.isSubscribed();
@@ -94,9 +146,18 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
+  // 🔽 FUNCIÓN DEL BOTÓN (Modificada con chequeo 'denied')
   const enableNotifications = async () => {
     setNotificationLoading(true);
     try {
+      // MEJORA: Añadimos un check para el caso 'denied'
+      if ('Notification' in window && Notification.permission === 'denied') {
+        alert('Las notificaciones están bloqueadas. Por favor, habilítalas manualmente en la configuración de tu navegador (junto a la URL) y vuelve a intentarlo.');
+        setNotificationLoading(false);
+        return;
+      }
+
+      // La lógica original de tu botón
       await notificationService.setupNotifications(user.id);
       setNotificationsEnabled(true);
       alert('¡Notificaciones habilitadas exitosamente!');
@@ -122,7 +183,7 @@ const Dashboard = ({ user, onLogout }) => {
     }
   };
 
-  // 🆕 Nueva función para enviar notificaciones personalizadas
+  // 🔽 Nueva función para enviar notificaciones personalizadas (ya la tenías)
   const sendCustomNotification = async () => {
     if (!selectedUser) {
       alert('Selecciona un usuario para enviar la notificación.');
@@ -140,10 +201,11 @@ const Dashboard = ({ user, onLogout }) => {
       setNotifTitle('');
       setNotifBody('');
     } catch (error) {
-      alert('❌ Error enviando notificación: ' + error.message);
+      alert('❌ Error enviando notificación: '+ a + error.message);
     }
   };
 
+  // 🔽 EL CÓDIGO JSX (return) SE MANTIENE EXACTAMENTE IGUAL
   return (
     <div className="dashboard">
       {!isOnline && (
@@ -245,7 +307,7 @@ const Dashboard = ({ user, onLogout }) => {
         )}
       </div>
 
-      {/* 🆕 Apartado para enviar notificación personalizada */}
+      {/* 🔽 Apartado para enviar notificación personalizada (ya lo tenías) */}
       <div className="user-info">
         <h2>Enviar Notificación a un Usuario</h2>
         <p>Selecciona un usuario y envíale una notificación personalizada.</p>
